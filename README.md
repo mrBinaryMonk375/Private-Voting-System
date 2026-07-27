@@ -12,7 +12,7 @@ A privacy-preserving zero-knowledge election platform built on the Midnight Netw
 
 ## 🚀 Live Demo, Video & Repository
 
-- 🌐 **Live Web Application:** *(Deploy to Vercel — link coming soon)*
+- 🌐 **Live Web Application:** https://private-voting-system-kps6hvr9l.vercel.app/
 - 📺 **Demo Video:** https://youtu.be/8kd9bpv4_HQ
 - 📦 **GitHub Repository:** https://github.com/mrBinaryMonk375/Private-Voting-System
 - ⚙️ **CI/CD Workflow:** `.github/workflows/ci.yml`
@@ -83,7 +83,7 @@ During the `cast_vote` circuit, the voter's choice is a **private witness**. The
 
 | Environment | Location / Address | Notes |
 |---|---|---|
-| Live Web App | *(Vercel link — coming soon)* | React + Vite frontend |
+| Live Web App | https://private-voting-system-kps6hvr9l.vercel.app/ | React + Vite frontend |
 | Preprod Smart Contract | *(Deploy in progress)* | Midnight Preprod Network |
 | CI/CD Workflow | `.github/workflows/ci.yml` | GitHub Actions — build & test |
 | Local Dev Server | `http://localhost:5173` | Run via `npm run dev` |
