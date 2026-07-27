@@ -71,6 +71,7 @@ export type VotingDeployment =
 export interface DeployedVotingAPIProvider {
   readonly votingDeployments$: Observable<Array<Observable<VotingDeployment>>>;
   readonly resolve: (contractAddress?: ContractAddress, electionTitle?: string) => Observable<VotingDeployment>;
+  readonly getProviders: () => Promise<VotingProviders>;
 }
 
 const COMPATIBLE_CONNECTOR_API_VERSION = '4.x';
@@ -106,7 +107,7 @@ export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
     return deployment;
   }
 
-  private getProviders(): Promise<VotingProviders> {
+  public getProviders(): Promise<VotingProviders> {
     return this.#initializedProviders ?? (this.#initializedProviders = initializeProviders(this.logger));
   }
 
@@ -192,13 +193,25 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
 
 const getFirstCompatibleWallet = (): InitialAPI | undefined => {
   if (!window.midnight) return undefined;
-  return Object.values(window.midnight).find(
+
+  const wallets = Object.values(window.midnight).filter(
     (wallet): wallet is InitialAPI =>
       !!wallet &&
       typeof wallet === 'object' &&
       'apiVersion' in wallet &&
       semver.satisfies(wallet.apiVersion, COMPATIBLE_CONNECTOR_API_VERSION),
   );
+
+  // Strictly find Lace and ignore 1AM
+  const trueLace = wallets.find(w => w.name && w.name.toLowerCase().includes('lace') && !w.name.toLowerCase().includes('1am'));
+  if (trueLace) return trueLace;
+
+  // Fallback to anything that isn't 1AM if exact Lace isn't found
+  const non1AM = wallets.find(w => w.name && !w.name.toLowerCase().includes('1am'));
+  if (non1AM) return non1AM;
+
+  // Last resort
+  return wallets[0];
 };
 
 const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAPI> => {
@@ -235,7 +248,8 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
         error
           ? throwError(() => {
               logger.error('Unable to connect to Lace: ' + error);
-              return new Error('Application is not authorized by the wallet.');
+              const msg = error instanceof Error ? error.message : typeof error === 'string' ? error : 'Application is not authorized by the wallet.';
+              return new Error(msg);
             })
           : apis,
       ),
