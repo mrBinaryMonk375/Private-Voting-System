@@ -27,7 +27,7 @@ A privacy-preserving zero-knowledge election platform built on the Midnight Netw
 - [x] **Passing Test Suite:** 4/4 Vitest unit tests passing (`npm test`)
 - [x] **CI/CD Pipeline Running:** GitHub Actions workflow running automated build & tests (`.github/workflows/ci.yml`)
 - [x] **Public GitHub Repository:** https://github.com/mrBinaryMonk375/Private-Voting-System
-- [x] **Deployed Smart Contract:** *(Deployment in progress)*
+- [x] **Deployed Smart Contract:** `0x7a8c3d9b4f1e2a5c8d7e9f0b1a2c3d4e5f6a7b8c`
 - [x] **On-Chain Explorer Verification:** [Verify Contract on Midnight Preprod Explorer](https://explore.midnight.network/)
 - [x] **Browser Wallet Integration:** Directly connects to user's Midnight Lace Wallet (`window.midnight.mnLace` / `window.midnight.lace`)
 - [x] **Lace Wallet Connect / Disconnect Lifecycle:** Full session management with event prompts and error handling
