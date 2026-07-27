@@ -67,6 +67,9 @@
     "compact": "cd contract && npm run compact",
     "build": "cd contract && npm run build && cd ../api && npm run build",
     "test": "cd contract && npm run test",
-    "deploy": "cd voting-cli && node --experimental-specifier-resolution=node --loader ts-node/esm src/launcher/preprod.ts"
+    "deploy": "cd voting-cli && node --experimental-specifier-resolution=node --loader ts-node/esm src/launcher/preprod.ts",
+    "setup": "cd voting-cli && npm run standalone",
+    "cli": "cd voting-cli && npm run standalone",
+    "dev": "cd voting-ui && npm run dev"
   }
 }
