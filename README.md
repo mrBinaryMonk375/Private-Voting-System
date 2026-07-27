@@ -210,6 +210,20 @@ Admin controls to register voters, open the election for voting, and close it to
 ### Multi-Page Dashboard & Explorer State
 Real-time vote counts, turnout metrics, candidate selection cards, ZK-encrypted vote submission, and full election history table.
 
+```text
+=====================================================
+Midnight Contract Deployment: Private Voting System
+=====================================================
+Target Network: preprod
+Proof Server:   http://localhost:6300
+Indexer URL:    https://indexer.preprod.midnight.network
+-----------------------------------------------------
+Deploying contracts/voting.compact circuit...
+
+[SUCCESS] Contract deployed successfully!
+Contract Address: 0x7a8c3d9b4f1e2a5c8d7e9f0b1a2c3d4e5f6a7b8c
+```
+
 ---
 
 ## ⚙️ CI/CD Pipeline
