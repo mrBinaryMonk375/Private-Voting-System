@@ -54,14 +54,14 @@ A privacy-preserving zero-knowledge election platform built on the Midnight Netw
 
 ## 🛡️ Midnight Privacy Model: What an Observer Learns vs Cannot Learn
 
-### ❌ What an Observer CANNOT Learn (Kept Strictly Private)
+### ❌ What an Observer CANNOT Learn (Kept Strictly Private):
 
 - **Individual Vote Choice:** The voter's actual selection (Candidate A or B) is injected as a private ZK witness inside `cast_vote`. It is never transmitted to the network, stored in public state, or disclosed on-chain.
 - **Voter's Private Key / Secret:** The admin and voter private keys remain entirely off-chain and are never submitted to any transaction.
 - **Admin Identity:** The election administrator's identity is protected — the contract only stores their public key hash, not their wallet address or identity.
 - **Voter Decision Timing:** Although a voter's public key appears in `hasVoted`, the exact moment of voting cannot be linked to a specific choice.
 
-### ✅ What an Observer CAN Learn (Disclosed On-Chain Public State)
+### ✅ What an Observer CAN Learn (Disclosed On-Chain Public State):
 
 - **Election Phase:** Whether the election is in `REGISTRATION`, `OPEN`, or `CLOSED` state.
 - **Election Title:** The human-readable name of the election stored in public ledger.
@@ -69,13 +69,7 @@ A privacy-preserving zero-knowledge election platform built on the Midnight Netw
 - **Registered Voters:** The set of public keys eligible to vote (`registeredVoters`).
 - **Voted Set:** The set of public keys that have already cast a ballot (`hasVoted`) — confirming participation without revealing the choice.
 
-### 🔐 What is Deliberately Disclosed
-
-During the `cast_vote` circuit, the voter's choice is a **private witness**. The ZK circuit:
-1. Verifies the choice is valid (A or B)
-2. Confirms the voter is registered
-3. Confirms the voter has not already voted
-4. Updates and **deliberately discloses only the updated public tallies** — the actual input is never exposed
+**🔐 What is Deliberately Disclosed:** During the `cast_vote` circuit, the voter's choice is a **private witness**. The ZK circuit verifies the choice is valid, confirms the voter is registered and hasn't voted, and **deliberately discloses only the updated public tallies** — the actual input is never exposed.
 
 ---
 
@@ -224,17 +218,14 @@ Private-Voting-System/
 
 ## 📸 Platform Screenshots
 
-### Landing Page — Connect or Quick Launch
+### Private Voting Portal
 The hero landing page with wallet connect, join election by contract address, or deploy a new election.
 
-### Election Dashboard — Live Voting
-Real-time vote counts, turnout metrics, candidate selection cards, and ZK-encrypted vote submission.
+### ZK Proof Generation & Activity Log
+Admin controls to register voters, open the election for voting, and close it to reveal final results while generating ZK proofs.
 
-### Admin Panel — Election Lifecycle
-Admin controls to register voters, open the election for voting, and close it to reveal final results.
-
-### Audit History — On-Chain Records
-Full election history table with contract addresses, status badges, vote tallies, and one-click inspect.
+### Multi-Page Dashboard & Explorer State
+Real-time vote counts, turnout metrics, candidate selection cards, ZK-encrypted vote submission, and full election history table.
 
 ---
 
