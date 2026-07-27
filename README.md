@@ -13,7 +13,7 @@ A privacy-preserving zero-knowledge election platform built on the Midnight Netw
 ## 🚀 Live Demo, Video & Repository
 
 - 🌐 **Live Web Application:** *(Deploy to Vercel — link coming soon)*
-- 📺 **Demo Video:** *(Coming soon)*
+- 📺 **Demo Video:** https://youtu.be/8kd9bpv4_HQ
 - 📦 **GitHub Repository:** https://github.com/mrBinaryMonk375/Private-Voting-System
 - ⚙️ **CI/CD Workflow:** `.github/workflows/ci.yml`
 
