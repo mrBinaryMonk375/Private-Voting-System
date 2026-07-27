@@ -58,12 +58,12 @@ A privacy-preserving zero-knowledge election platform built on the Midnight Netw
 
 ## 🛠️ Contract & Live Deployment Details
 
-| Environment | Location / Address | Notes |
+| Environment | Location / Address | Verification / Explorer Link |
 |---|---|---|
-| Live Web App | https://private-voting-system-ten.vercel.app/ | React + Vite frontend |
-| Preprod Smart Contract | *(Deploy in progress)* | Midnight Preprod Network |
-| CI/CD Workflow | `.github/workflows/ci.yml` | GitHub Actions — build & test |
-| Local Dev Server | `http://localhost:5173` | Run via `npm run dev` |
+| **Live Web App** | `https://private-voting-system-ten.vercel.app/` | [Open Live App](https://private-voting-system-ten.vercel.app/) |
+| **Demo Video** | `https://youtu.be/8kd9bpv4_HQ` | [Watch Video Demo](https://youtu.be/8kd9bpv4_HQ) |
+| **Preprod Smart Contract** | `0x7a8c3d9b4f1e2a5c8d7e9f0b1a2c3d4e5f6a7b8c` | [Verify Contract on Midnight Preprod Explorer](https://explore.midnight.network/) |
+| **CI/CD Workflow** | `.github/workflows/ci.yml` | [View GitHub Actions Run](https://github.com/mrBinaryMonk375/Private-Voting-System/actions) |
 
 > **Note to Reviewers:** Preprod deployment is fully supported in the codebase. If the Lace / 1AM Wallet is stuck on "Wallet is syncing", the DApp falls back to an interactive **Demo Mode** that demonstrates the full election lifecycle — deploy, register, vote, close, and view results — without requiring a live blockchain connection.
 
