@@ -7,6 +7,7 @@ A privacy-preserving zero-knowledge election platform built on the Midnight Netw
 ![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.0.0-10b981?style=for-the-badge)
 ![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-06b6d4?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-64748b?style=for-the-badge)
+[![CI — Private Voting System](https://github.com/mrBinaryMonk375/Private-Voting-System/actions/workflows/ci.yml/badge.svg)](https://github.com/mrBinaryMonk375/Private-Voting-System/actions/workflows/ci.yml)
 
 ---
 
