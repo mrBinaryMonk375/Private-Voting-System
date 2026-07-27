@@ -58,7 +58,8 @@ jspm_packages/
 *.sln
 
 # Compact
-managed/
+# managed/
 
 .claude
 .midnight-expert
+.vercel
