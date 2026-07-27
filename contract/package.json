@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "build": "rm -rf dist && tsc --project tsconfig.build.json && cp -Rf ./src/managed ./dist/managed && cp ./src/voting.compact ./dist",
+    "build": "node -e \"const fs=require('fs'); fs.rmSync('dist', {recursive:true, force:true});\" && tsc --project tsconfig.build.json && node -e \"const fs=require('fs'); fs.mkdirSync('dist', {recursive:true}); if (fs.existsSync('./src/managed')) fs.cpSync('./src/managed', './dist/managed', {recursive:true}); if (fs.existsSync('./src/voting.compact')) fs.copyFileSync('./src/voting.compact', './dist/voting.compact');\"",
     "ci": "npm run compact && npm run typecheck && npm run lint && npm run build && npm run test",
     "compact": "compact compile src/voting.compact ./src/managed/voting",
     "lint": "eslint src",

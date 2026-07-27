@@ -6,7 +6,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "rm -rf ./dist && tsc && vite build --mode preprod && cp -r ../contract/src/managed/voting/keys ./dist/keys && cp -r ../contract/src/managed/voting/zkir ./dist/zkir",
+    "build": "node -e \"const fs=require('fs'); fs.rmSync('./dist', {recursive:true, force:true});\" && tsc && vite build --mode preprod && node -e \"const fs=require('fs'); if(fs.existsSync('../contract/src/managed/voting/keys')) fs.cpSync('../contract/src/managed/voting/keys', './dist/keys', {recursive:true}); if(fs.existsSync('../contract/src/managed/voting/zkir')) fs.cpSync('../contract/src/managed/voting/zkir', './dist/zkir', {recursive:true});\"",
     "build:preview": "rm -rf ./dist && tsc && vite build --mode preview && cp -r ../contract/src/managed/voting/keys ./dist/keys && cp -r ../contract/src/managed/voting/zkir ./dist/zkir",
     "build:start": "npm run build && npm run start",
     "build:start:preview": "npm run build:preview && npm run start",

@@ -153,7 +153,7 @@ export class VotingAPI implements DeployedVotingAPI {
    */
   async castVote(choice: VoteChoice): Promise<void> {
     this.logger?.info(`castVote (choice is private — not logged)`);
-    const txData = await this.deployedContract.callTx.castVote(choice);
+    const txData = await this.deployedContract.callTx.castVote(choice as any);
     this.logger?.trace({ transactionAdded: { circuit: 'castVote', txHash: txData.public.txHash } });
   }
 

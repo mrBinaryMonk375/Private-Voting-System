@@ -54,7 +54,7 @@ describe("Voting contract — initial state", () => {
     expect(privateState.secretKey).toEqual(adminKey);
 
     // Secret key should NOT appear anywhere in the ledger
-    const ledgerJson = JSON.stringify(ledgerState);
+    const ledgerJson = JSON.stringify(ledgerState, (_, v) => (typeof v === 'bigint' ? v.toString() : v));
     const adminKeyHex = Buffer.from(adminKey).toString('hex');
     expect(ledgerJson).not.toContain(adminKeyHex);
   });

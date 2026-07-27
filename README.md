@@ -29,8 +29,9 @@ During the `cast_vote` circuit, the voter's choice is injected as a private witn
 
 > **Note to Mentors/Reviewers:** 
 > Preprod deployment is fully supported in this codebase. However, if the Lace / 1AM Wallet is stuck on the "Wallet is syncing" screen when connecting to the Preprod network, the DApp cannot establish a connection.
-> - **Workaround used:** The contract is fully tested, compiles, and deploys locally. We have successfully funded the Preprod wallet and the DApp is hardcoded to connect to the Preprod network.
-> - **Full-Stack UI:** The UI has been fully built and tested to handle connection errors, wallet detection, and transaction signing for when the Preprod sync completes.
+> - **Mentor Guidance Followed:** *"If you're unable to deploy, just build the full-stack dApp and submit it. Skip the deployment part for now. Vibe-code the full-stack dApp using the prompt, then submit."*
+> - **Workaround Used:** The contract is fully tested, compiles, and deploys locally. We have successfully funded the Preprod wallet and the DApp is hardcoded to connect to the Preprod network.
+> - **Full-Stack UI & Demo Mode:** The UI has been fully built and tested to handle connection errors, wallet detection, interactive demo mode, and transaction signing for when the Preprod sync completes.
 
 ---
 

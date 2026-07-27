@@ -45,7 +45,7 @@ import {
 } from '@midnight-ntwrk/midnight-js-protocol/ledger';
 import { VotingPrivateState } from '@midnight-ntwrk/voting-contract';
 import { inMemoryPrivateStateProvider } from '../in-memory-private-state-provider';
-import { NetworkId } from '@midnight-ntwrk/midnight-js-network-id';
+import { setNetworkId, NetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import type { UnboundTransaction } from '@midnight-ntwrk/midnight-js-types';
 import { type VoteChoice } from '../../../api/src/common-types';
 
@@ -108,7 +108,13 @@ export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
   }
 
   public getProviders(): Promise<VotingProviders> {
-    return this.#initializedProviders ?? (this.#initializedProviders = initializeProviders(this.logger));
+    if (!this.#initializedProviders) {
+      this.#initializedProviders = initializeProviders(this.logger).catch((err) => {
+        this.#initializedProviders = undefined;
+        throw err;
+      });
+    }
+    return this.#initializedProviders;
   }
 
   private async deployDeployment(
@@ -150,6 +156,9 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
   const zkConfigPath = window.location.origin;
   const keyMaterialProvider = new FetchZkConfigProvider<VotingCircuitKeys>(zkConfigPath, fetch.bind(window));
   const config = await connectedAPI.getConfiguration();
+  if (config.networkId) {
+    setNetworkId(config.networkId as NetworkId);
+  }
   const inMemoryPrivateState = inMemoryPrivateStateProvider<string, VotingPrivateState>();
   const shieldedAddresses = await connectedAPI.getShieldedAddresses();
 
@@ -194,24 +203,25 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
 const getFirstCompatibleWallet = (): InitialAPI | undefined => {
   if (!window.midnight) return undefined;
 
-  const wallets = Object.values(window.midnight).filter(
-    (wallet): wallet is InitialAPI =>
-      !!wallet &&
-      typeof wallet === 'object' &&
-      'apiVersion' in wallet &&
-      semver.satisfies(wallet.apiVersion, COMPATIBLE_CONNECTOR_API_VERSION),
+  const allWallets = Object.values(window.midnight).filter(
+    (wallet): wallet is InitialAPI => !!wallet && typeof wallet === 'object' && 'apiVersion' in wallet
   );
 
-  // Strictly find Lace and ignore 1AM
-  const trueLace = wallets.find(w => w.name && w.name.toLowerCase().includes('lace') && !w.name.toLowerCase().includes('1am'));
+  if (allWallets.length === 0) return undefined;
+
+  const compatibleWallets = allWallets.filter((wallet) =>
+    semver.satisfies(wallet.apiVersion, COMPATIBLE_CONNECTOR_API_VERSION)
+  );
+
+  const pool = compatibleWallets.length > 0 ? compatibleWallets : allWallets;
+
+  const trueLace = pool.find(w => w.name && w.name.toLowerCase().includes('lace') && !w.name.toLowerCase().includes('1am'));
   if (trueLace) return trueLace;
 
-  // Fallback to anything that isn't 1AM if exact Lace isn't found
-  const non1AM = wallets.find(w => w.name && !w.name.toLowerCase().includes('1am'));
+  const non1AM = pool.find(w => w.name && !w.name.toLowerCase().includes('1am'));
   if (non1AM) return non1AM;
 
-  // Last resort
-  return wallets[0];
+  return pool[0];
 };
 
 const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAPI> => {
@@ -223,7 +233,7 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
       filter((connectorAPI): connectorAPI is InitialAPI => !!connectorAPI),
       take(1),
       timeout({
-        first: 1_000,
+        first: 2_000,
         with: () =>
           throwError(() => {
             logger.error('Could not find Lace wallet connector API');
@@ -231,13 +241,26 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
           }),
       }),
       concatMap(async (initialAPI) => {
-        const connectedAPI = await initialAPI.connect(networkId);
-        const connectionStatus = await connectedAPI.getConnectionStatus();
-        logger.info(connectionStatus, 'Wallet connected');
-        return connectedAPI;
+        const candidateNetworks = Array.from(
+          new Set([networkId, 'testnet', 'undeployed', 'preprod', 'devnet', 'preview'])
+        );
+        let lastError: any;
+        for (const net of candidateNetworks) {
+          try {
+            logger.info(`Attempting wallet connection with networkId: ${net}`);
+            const connectedAPI = await initialAPI.connect(net);
+            const connectionStatus = await connectedAPI.getConnectionStatus();
+            logger.info(connectionStatus, `Wallet connected on network: ${net}`);
+            return connectedAPI;
+          } catch (err: any) {
+            lastError = err;
+            logger.warn(`Failed connection with networkId ${net}: ${err?.message || err}`);
+          }
+        }
+        throw lastError;
       }),
       timeout({
-        first: 5_000,
+        first: 10_000,
         with: () =>
           throwError(() => {
             logger.error('Lace wallet has failed to respond');
