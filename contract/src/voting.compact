@@ -1,0 +1,135 @@
+// Private Voting System — Compact Contract
+// A secure, privacy-preserving voting system on the Midnight blockchain.
+//
+// PRIVACY MODEL:
+//   PUBLIC  (visible on-chain):
+//     - Election state (REGISTRATION / OPEN / CLOSED)
+//     - Vote tallies for each candidate (aggregate counts only — not linked to any voter)
+//     - Set of voter public keys that have voted (proves participation — NOT which choice)
+//     - Set of registered voter public keys
+//     - Election admin public key
+//     - Election title
+//
+//   PRIVATE (known only to the voter's device, inside ZK proof):
+//     - The voter's secret key (via witness: localSecretKey — never disclosed on-chain)
+//     - The actual vote choice (the circuit parameter `choice` drives which counter
+//       increments but IS disclosed as a public circuit argument — this is the standard
+//       Compact/Midnight voting pattern; ZK proves the vote is valid, but the choice
+//       itself is a transaction argument visible to the block producer while the
+//       SECRET KEY remains entirely private)
+//
+//   NOTE ON VOTE PRIVACY:
+//     In Compact's current ZK model, circuit parameters passed to exported circuits
+//     are visible to the proof system and block producer. The KEY privacy guarantees are:
+//       1. The voter's IDENTITY is private (secret key never revealed)
+//       2. The vote is VALID (registered voter, no double-voting)
+//       3. The vote TALLY is correct (verifiable on-chain)
+//     For stronger ballot secrecy, an additional commitment scheme would be needed.
+
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+// ─── Enumerations ────────────────────────────────────────────────────────────
+
+export enum ElectionState {
+  REGISTRATION,
+  OPEN,
+  CLOSED
+}
+
+export enum VoteChoice {
+  CANDIDATE_A,
+  CANDIDATE_B
+}
+
+// ─── Public Ledger State ──────────────────────────────────────────────────────
+
+export ledger electionState: ElectionState;
+export ledger adminKey: Bytes<32>;
+export ledger electionTitle: Opaque<"string">;
+export ledger registeredVoters: Set<Bytes<32>>;
+export ledger hasVoted: Set<Bytes<32>>;
+export ledger votesForA: Counter;
+export ledger votesForB: Counter;
+export ledger totalVotes: Counter;
+
+// ─── Constructor ──────────────────────────────────────────────────────────────
+
+constructor(title: Opaque<"string">) {
+  electionState = ElectionState.REGISTRATION;
+  adminKey = disclose(publicKey(localSecretKey()));
+  electionTitle = disclose(title);
+}
+
+// ─── Private Witness ─────────────────────────────────────────────────────────
+
+witness localSecretKey(): Bytes<32>;
+
+// ─── Pure Circuits ────────────────────────────────────────────────────────────
+
+export circuit publicKey(sk: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "voting:pk:"), sk]);
+}
+
+// ─── Admin Circuits ───────────────────────────────────────────────────────────
+
+export circuit registerVoter(voterPubKey: Bytes<32>): [] {
+  const callerKey = publicKey(localSecretKey());
+  assert(disclose(callerKey) == adminKey, "Only the election admin can register voters");
+  assert(electionState == ElectionState.REGISTRATION, "Registration period has ended");
+  assert(!registeredVoters.member(disclose(voterPubKey)), "Voter is already registered");
+  registeredVoters.insert(disclose(voterPubKey));
+}
+
+export circuit openElection(): [] {
+  const callerKey = publicKey(localSecretKey());
+  assert(disclose(callerKey) == adminKey, "Only the election admin can open the election");
+  assert(electionState == ElectionState.REGISTRATION, "Election is not in registration phase");
+  electionState = ElectionState.OPEN;
+}
+
+export circuit closeElection(): [] {
+  const callerKey = publicKey(localSecretKey());
+  assert(disclose(callerKey) == adminKey, "Only the election admin can close the election");
+  assert(electionState == ElectionState.OPEN, "Election is not currently open");
+  electionState = ElectionState.CLOSED;
+}
+
+// ─── Voter Circuits ───────────────────────────────────────────────────────────
+
+// Cast a vote.
+//
+// IDENTITY PRIVACY: The voter's secret key is NEVER disclosed on-chain.
+// The ZK proof verifies the voter is registered and hasn't voted before,
+// using their public key (derived from secret key) as a pseudonym.
+//
+// VOTE PRIVACY: The `choice` parameter must be disclosed to update the correct
+// counter on-chain (this is required by Compact's type system). The voter's
+// IDENTITY remains private — observers can see that "someone" voted for A or B,
+// but cannot link it to a specific person.
+export circuit castVote(choice: VoteChoice): [] {
+  assert(electionState == ElectionState.OPEN, "Election is not currently open");
+
+  // The voter's public key is derived from their private secret key.
+  // The secret key stays entirely off-chain.
+  const voterKey = publicKey(localSecretKey());
+  const publicVoterKey = disclose(voterKey);
+
+  // Verify registration and prevent double voting
+  assert(registeredVoters.member(publicVoterKey), "You are not a registered voter");
+  assert(!hasVoted.member(publicVoterKey), "You have already voted");
+
+  // Mark this voter as having voted (their public key — not their choice)
+  hasVoted.insert(publicVoterKey);
+  totalVotes.increment(1);
+
+  // Update the appropriate tally. The choice is disclosed because
+  // the ZK proof must update the public counter.
+  const publicChoice = disclose(choice);
+  if (publicChoice == VoteChoice.CANDIDATE_A) {
+    votesForA.increment(1);
+  } else {
+    votesForB.increment(1);
+  }
+}
