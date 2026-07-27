@@ -6,6 +6,7 @@ import { type ContractAddress } from '@midnight-ntwrk/midnight-js-protocol/compa
 export interface UseDeployedVotingResult {
   resolve: (contractAddress?: ContractAddress, title?: string) => Observable<VotingDeployment>;
   deployments: Array<Observable<VotingDeployment>>;
+  getProviders: () => Promise<any>;
 }
 
 export const useDeployedVotingContext = (): UseDeployedVotingResult => {
@@ -24,6 +25,7 @@ export const useDeployedVotingContext = (): UseDeployedVotingResult => {
 
   return {
     resolve: (contractAddress, title) => provider.resolve(contractAddress, title),
+    getProviders: () => provider.getProviders(),
     deployments,
   };
 };
