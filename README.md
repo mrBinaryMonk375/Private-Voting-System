@@ -119,6 +119,20 @@ docker run -d -p 6300:6300 midnightntwrk/proof-server:8.1.0
 npm run compact
 ```
 
+**Expected output:**
+```text
+> @midnight-ntwrk/voting-contract@0.1.0 compact
+> compact compile src/voting.compact src/managed/voting
+
+Compiling src/voting.compact...
+Generating ZK circuits and keys...
+  - src/managed/voting/zkir/castVote.zkir
+  - src/managed/voting/zkir/registerVoter.zkir
+  - src/managed/voting/zkir/openElection.zkir
+  - src/managed/voting/zkir/closeElection.zkir
+Compilation successful! Artifacts written to src/managed/voting
+```
+
 **Start local environment:**
 ```bash
 npm run setup -- --network undeployed
