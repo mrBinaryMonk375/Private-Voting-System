@@ -216,10 +216,15 @@ Private-Voting-System/
 
 ## 📸 Platform Screenshots
 
+<img width="1917" height="976" alt="Screenshot 2026-07-27 210042" src="https://github.com/user-attachments/assets/2ee0d3ca-b304-4a24-a558-c76810ff67e6" />
+
+
 ### Private Voting Portal
 The hero landing page with wallet connect, join election by contract address, or deploy a new election.
 
 ### ZK Proof Generation & Activity Log
+<img width="1917" height="920" alt="Screenshot 2026-07-27 210152" src="https://github.com/user-attachments/assets/b4df208e-6387-49dd-a1d2-c66120f153b1" />
+
 Admin controls to register voters, open the election for voting, and close it to reveal final results while generating ZK proofs.
 
 ### Multi-Page Dashboard & Explorer State
